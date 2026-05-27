@@ -4,6 +4,8 @@ One dashboard for every Claude Code agent you run — on this machine or any
 remote SSH box — showing **Machine / Folder / Summary / Status**, with a
 **Telegram** ping when an agent needs your input or has been left waiting.
 
+![pagr dashboard — the Mission Control skin](assets/preview.png)
+
 It works by installing a tiny [hook](hooks/pagr-hook) on each machine that
 POSTs Claude Code lifecycle events to a central service (hosted on InstaPods).
 
