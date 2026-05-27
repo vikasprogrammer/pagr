@@ -843,10 +843,10 @@ DASHBOARD_HTML = r"""<!doctype html>
 <script>
 const META = {
   needs_input:{label:"NEEDS INPUT", order:0, group:"Needs you", led:"la"},
-  waiting:    {label:"WAITING",     order:0, group:"Needs you", led:"lp"},
-  working:    {label:"WORKING",     order:1, group:"Working",   led:"lw"},
-  idle:       {label:"IDLE",        order:2, group:"Idle / done", led:"lg"},
-  ended:      {label:"ENDED",       order:3, group:"Idle / done", led:"li"},
+  waiting:    {label:"WAITING",     order:1, group:"Needs you", led:"lp"},
+  working:    {label:"WORKING",     order:2, group:"Working",   led:"lw"},
+  idle:       {label:"IDLE",        order:3, group:"Idle / done", led:"lg"},
+  ended:      {label:"ENDED",       order:4, group:"Idle / done", led:"li"},
 };
 const SKIN_LABEL = {clean:"CLEAN", mission:"MISSION CONTROL"};
 let KEY = new URLSearchParams(location.search).get("key") || localStorage.getItem("pagr_key") || "";
@@ -937,8 +937,8 @@ function renderFeed(){
   const grid = VIEW === "grid";
   const items = arr => grid
     ? '<div class="gcards">' + arr.map(s => gcard(s, now)).join("") + '</div>'
-    : FEEDHEAD + arr.map(s => frow(s, now)).join("");
-  let html = "";
+    : arr.map(s => frow(s, now)).join("");
+  let html = grid ? "" : FEEDHEAD;   // one column header for the whole table
   if (MODE === "machine"){
     const groups = {};
     sessions.forEach(s => { (groups[s.machine] = groups[s.machine] || []).push(s); });
@@ -952,7 +952,7 @@ function renderFeed(){
     const groups = []; const seen = {};
     sessions.slice().sort(byStatusThenTime).forEach(s => {
       const g = (META[s.status]||{group:"Other"}).group;
-      if (!seen[g]){ seen[g] = {name:g, alert:ordOf(s)===0, items:[]}; groups.push(seen[g]); }
+      if (!seen[g]){ seen[g] = {name:g, alert:needy(s), items:[]}; groups.push(seen[g]); }
       seen[g].items.push(s);
     });
     groups.forEach(g => { html += '<div class="grp'+(g.alert?' alert':'')+'">'+esc(g.name)+'</div>' + items(g.items); });
