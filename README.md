@@ -1,5 +1,7 @@
 # pagr
 
+[![Deploy to InstaPods](https://instapods.com/deploy-button.svg)](https://app.instapods.com/dashboard/pods/create?repo=https://github.com/vikasprogrammer/pagr&utm_source=readme_badge)
+
 One dashboard for every Claude Code agent you run — on this machine or any
 remote SSH box — showing **Machine / Folder / Summary / Status**, with a
 **Telegram** ping when an agent needs your input or has been left waiting.
