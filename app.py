@@ -735,8 +735,39 @@ DASHBOARD_HTML = r"""<!doctype html>
   .t-path{color:var(--faint);font-family:var(--font-mono);font-size:11.5px}
   .cell-branch{color:var(--c-working);font-size:12px;font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .cell-age{color:var(--faint);text-align:right;font-size:12px}
-  .empty,.locked{color:var(--muted);text-align:center;margin-top:64px}
-  .locked input{background:var(--panel);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:9px 12px;margin:10px 6px 0;width:250px;font-size:14px}
+  .empty{color:var(--muted);text-align:center;margin-top:64px}
+
+  /* ---------- login gate ---------- */
+  body[data-locked] .crumb,body[data-locked] .metrics,body[data-locked] .cmd-right,
+  body[data-locked] .rail,body[data-locked] .feed-controls{display:none}
+  body[data-locked] .layout{display:flex;justify-content:center;align-items:center;
+    min-height:calc(100vh - 110px);padding-top:0;padding-bottom:0}
+  body[data-locked] .feed-wrap{width:100%;max-width:380px}
+  .gate{width:100%;display:flex;justify-content:center}
+  .gate-card{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    box-shadow:var(--shadow-hi);padding:36px 34px 28px;text-align:center}
+  body[data-skin="mission"] .gate-card{border-radius:8px}
+  .gate-radar{width:122px;height:122px;aspect-ratio:auto;border-radius:50%;margin:0 auto 20px;border-color:var(--line2)}
+  .gate-radar .blip{animation:blink 2.6s steps(1) infinite}
+  .gate-title{font-family:var(--font-head);font-size:27px;font-weight:700;margin:0;color:var(--text);
+    letter-spacing:var(--head-spacing);text-transform:var(--head-transform)}
+  .gate-sub{color:var(--muted);font-size:13.5px;margin:7px 0 24px}
+  .gate-form{display:flex;flex-direction:column;gap:10px}
+  .gate-input{display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line2);
+    border-radius:10px;padding:0 13px;cursor:text;transition:border-color .14s,box-shadow .14s}
+  .gate-input:focus-within{border-color:var(--c-working);box-shadow:0 0 0 3px var(--radar-sweep)}
+  .gate-input svg{flex:none;color:var(--faint);transition:color .14s}
+  .gate-input:focus-within svg{color:var(--c-working)}
+  .gate-input input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);
+    font:14px/1 var(--font-mono);letter-spacing:.5px;padding:13px 0}
+  .gate-input input::placeholder{color:var(--faint);letter-spacing:1.5px}
+  .gate-btn{width:100%;margin-top:2px;background:var(--c-working);color:#fff;border:1px solid var(--c-working);
+    border-radius:10px;padding:12px;font:600 14px var(--font-ui);letter-spacing:.3px;cursor:pointer;transition:filter .12s}
+  body[data-skin="mission"] .gate-btn{border-radius:6px;color:#04121a;font-size:13px}
+  .gate-btn:hover{filter:brightness(1.08)}
+  .gate-hint{color:var(--faint);font-size:12px;margin:18px 0 0;line-height:1.55}
+  .gate-hint code{font-family:var(--font-mono);font-size:11px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:5px;padding:1.5px 5px;color:var(--muted)}
   a{color:var(--c-working)}
 
   /* ---------- modals ---------- */
@@ -766,6 +797,12 @@ DASHBOARD_HTML = r"""<!doctype html>
   .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .primary{background:var(--c-working);color:#fff;border-color:var(--c-working)}
   .subtle{color:var(--muted);font-size:12px} .hint{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+  .signout{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .signout .so-label{font-size:13px;font-weight:600;color:var(--text)}
+  .signout .so-sub{font-size:11.5px;color:var(--faint);margin-top:2px}
+  .signout-btn{white-space:nowrap}
+  .signout-btn:hover{border-color:#cf222e;color:#cf222e}
+  body[data-skin="mission"] .signout-btn:hover{border-color:#ff6b6b;color:#ff6b6b}
 
   @media(max-width:860px){ .layout{grid-template-columns:1fr} .rail{position:static} .metrics{order:3;width:100%;margin:8px 0 0;justify-content:flex-start} .metric{border-left:none;border-right:1px solid var(--line);padding-left:0} }
   @media(max-width:620px){ .feedhead{display:none} .frow{grid-template-columns:1fr auto;gap:5px 10px} .cell-branch{display:none} .cell-age{grid-column:2;grid-row:1} }
@@ -836,6 +873,13 @@ DASHBOARD_HTML = r"""<!doctype html>
         <button onclick="testTelegram()">Send test</button>
         <span id="settingsMsg" class="subtle"></span>
       </div>
+      <div class="signout">
+        <div>
+          <div class="so-label">Signed in</div>
+          <div class="so-sub">Your pagr key is stored on this browser.</div>
+        </div>
+        <button class="signout-btn" onclick="logout()">Lock / Sign out</button>
+      </div>
     </div>
   </div>
 </div>
@@ -886,9 +930,24 @@ function setSkin(v){
 function toggleMode(){ MODE = (MODE==="status")?"machine":"status"; localStorage.setItem("pagr_mode", MODE); paint(); }
 
 function lock(){
-  $("feed").innerHTML = '<div class="locked">Enter your pagr key to view agents.'
-    + '<div><input id="k" type="password" placeholder="PAGR_TOKEN" autofocus>'
-    + '<button onclick="saveKey()">Unlock</button></div></div>';
+  document.body.dataset.locked = "1";
+  $("feed").innerHTML =
+    '<div class="gate"><div class="gate-card">'
+    + '<div class="radar gate-radar"><div class="sweep"></div>'
+      + '<div class="blip" style="top:30%;left:60%"></div>'
+      + '<div class="blip" style="top:60%;left:44%;animation-delay:.9s"></div>'
+      + '<div class="blip" style="top:47%;left:53%;animation-delay:1.7s"></div></div>'
+    + '<h1 class="gate-title">pagr</h1>'
+    + '<p class="gate-sub">Your agents, on one radar.</p>'
+    + '<form class="gate-form" onsubmit="saveKey();return false">'
+      + '<label class="gate-input">'
+        + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="6"/><path d="M12.5 10.5 22 1"/><path d="m17.5 5.5 3 3"/><path d="m20 3 2 2"/></svg>'
+        + '<input id="k" type="password" placeholder="PAGR_TOKEN" autofocus autocomplete="off" spellcheck="false" aria-label="pagr token">'
+      + '</label>'
+      + '<button class="gate-btn" type="submit">Unlock fleet</button>'
+    + '</form>'
+    + '<p class="gate-hint">Paste the <code>PAGR_TOKEN</code> from your server\'s environment.</p>'
+    + '</div></div>';
 }
 function saveKey(){ const v=$("k").value.trim(); if(!v) return; localStorage.setItem("pagr_key", v); KEY=v; location.href=location.pathname; }
 
@@ -1022,6 +1081,7 @@ function openSettings(){
   $("settingsModal").classList.add("show");
 }
 function closeSettings(){ $("settingsModal").classList.remove("show"); }
+function logout(){ localStorage.removeItem("pagr_key"); KEY=""; location.href=location.pathname; }
 async function detectChat(){
   const msg=$("settingsMsg"); msg.textContent="detecting…";
   try{
