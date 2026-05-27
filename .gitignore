@@ -1,0 +1,21 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Local data / secrets (pagr stores config + sqlite at runtime)
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*
+
+# Backups created by the enroll/merge step
+*.pagr.bak
+*.vnotify.bak
+
+# Misc
+.DS_Store
+*.log
+.instapods-build-hash

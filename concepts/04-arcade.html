@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pagr — agent arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15152b; --paper:#fde7c7; --card:#fffaf0;
+    --blue:#4d8bff; --coral:#ff5a5f; --mint:#2ec4b6; --yellow:#ffd23f; --purple:#9b5de5; --pink:#ff70a6;
+    --sh:5px 5px 0 var(--ink);
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:"Baloo 2",system-ui,sans-serif; color:var(--ink);
+    background:var(--paper);
+    background-image:radial-gradient(var(--ink) 1.4px, transparent 1.4px);
+    background-size:22px 22px; background-position:center; }
+  .px{font-family:"Press Start 2P",monospace; line-height:1.6}
+  .wrap{max-width:1140px; margin:0 auto; padding:22px 18px 70px}
+
+  header{display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    background:var(--yellow); border:3px solid var(--ink); border-radius:16px; box-shadow:var(--sh);
+    padding:16px 18px; margin-bottom:8px}
+  .logo{font-family:"Press Start 2P"; font-size:20px; letter-spacing:1px;
+    text-shadow:3px 3px 0 #fff, 5px 5px 0 var(--ink)}
+  .coins{display:flex; gap:10px; margin-left:auto; flex-wrap:wrap}
+  .coin{background:var(--card); border:3px solid var(--ink); border-radius:12px; padding:7px 12px;
+    box-shadow:3px 3px 0 var(--ink); display:flex; align-items:center; gap:8px}
+  .coin .px{font-size:10px} .coin b{font-family:"Press Start 2P"; font-size:13px}
+  .coin.alert{background:var(--coral); color:#fff; animation:bob .9s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-3px)}}
+
+  nav{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 24px}
+  nav button{font-family:"Baloo 2"; font-weight:800; font-size:14px; cursor:pointer;
+    background:var(--card); border:3px solid var(--ink); border-radius:12px; padding:9px 15px; box-shadow:3px 3px 0 var(--ink);
+    transition:transform .08s, box-shadow .08s}
+  nav button:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink)}
+  nav button:active{transform:translate(3px,3px); box-shadow:0 0 0 var(--ink)}
+  nav .b-blue{background:var(--blue); color:#fff} nav .b-pink{background:var(--pink); color:#fff}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px}
+  .card{background:var(--card); border:3px solid var(--ink); border-radius:18px; box-shadow:var(--sh);
+    padding:15px; position:relative; overflow:hidden}
+  .card.need{animation:wiggle 2.2s ease-in-out infinite}
+  @keyframes wiggle{0%,92%,100%{transform:rotate(0)}94%{transform:rotate(-1.2deg)}97%{transform:rotate(1.2deg)}}
+  .ribbon{position:absolute; top:13px; right:-34px; transform:rotate(45deg); width:130px; text-align:center;
+    font-family:"Press Start 2P"; font-size:8px; padding:5px 0; color:#fff; border:2px solid var(--ink)}
+  .card.need .ribbon{background:var(--coral)} .card.work .ribbon{background:var(--blue)}
+  .card.wait .ribbon{background:var(--purple)} .card.idle .ribbon{background:#9aa0b4}
+
+  .top{display:flex; gap:13px; align-items:center; margin-bottom:12px}
+  .ava{width:56px; height:56px; flex:none; border:3px solid var(--ink); border-radius:14px; display:grid; place-items:center;
+    font-size:30px; box-shadow:3px 3px 0 var(--ink)}
+  .meta .mach{font-family:"Press Start 2P"; font-size:9px; color:#7a5; }
+  .meta .mach b{color:var(--ink)}
+  .meta .lvl{font-weight:800; font-size:13px; color:#8a8aa3}
+  .title{font-weight:800; font-size:20px; line-height:1.1; margin:2px 0 8px}
+  .flavor{font-size:14.5px; font-weight:500; color:#4a4a63; min-height:2.7em;
+    background:rgba(0,0,0,.04); border-radius:10px; padding:8px 11px; border:2px dashed rgba(21,21,43,.18)}
+  .bars{margin-top:12px; display:grid; gap:7px}
+  .barrow{display:flex; align-items:center; gap:9px}
+  .barrow .px{font-size:8px; width:26px; color:#8a8aa3}
+  .track{flex:1; height:14px; border:2px solid var(--ink); border-radius:8px; background:#fff; overflow:hidden;
+    background-image:repeating-linear-gradient(90deg,transparent 0 12px, rgba(21,21,43,.08) 12px 13px)}
+  .track i{display:block; height:100%}
+  .hp i{background:var(--mint)} .xp i{background:var(--yellow)}
+  .foot{display:flex; justify-content:space-between; align-items:center; margin-top:13px;
+    font-family:"Press Start 2P"; font-size:8px; color:#9a9ab0}
+  .tag{background:var(--ink); color:var(--card); border-radius:7px; padding:4px 8px; font-family:"Baloo 2"; font-weight:700; font-size:12px}
+  .status{font-family:"Press Start 2P"; font-size:9px; padding:6px 9px; border:2px solid var(--ink); border-radius:9px}
+  .s-work{background:var(--blue); color:#fff} .s-need{background:var(--coral); color:#fff}
+  .s-wait{background:var(--purple); color:#fff} .s-idle{background:#e7e2d2}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">PAGR</div>
+    <div class="coins">
+      <div class="coin"><span class="px">AGENTS</span><b>06</b></div>
+      <div class="coin alert"><span class="px">NEED YOU</span><b>02</b></div>
+      <div class="coin"><span class="px">MACHINES</span><b>02</b></div>
+    </div>
+  </header>
+  <nav>
+    <button class="b-pink">★ NEEDS YOU</button>
+    <button class="b-blue">▣ MACHINES</button>
+    <button>⇅ GROUP</button>
+    <button>✦ CLEAR DONE</button>
+    <button>⚙ SETTINGS</button>
+  </nav>
+
+  <div class="grid">
+    <!-- needs you -->
+    <div class="card need">
+      <div class="ribbon">PLAYER&nbsp;1!</div>
+      <div class="top">
+        <div class="ava" style="background:var(--coral)">🛠️</div>
+        <div class="meta"><div class="mach">▸ <b>jump-server</b></div><div class="lvl">Lv.4 · DB Wrangler</div></div>
+      </div>
+      <div class="title">Fix failing DB migration</div>
+      <div class="flavor">“permission: run <b>alembic upgrade head</b>? press ▶ to continue…”</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:60%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:80%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-need">❗ NEEDS YOU</span><span class="tag">deploy</span><span>2M AGO</span></div>
+    </div>
+
+    <!-- working -->
+    <div class="card work">
+      <div class="ribbon">ON QUEST</div>
+      <div class="top">
+        <div class="ava" style="background:var(--blue)">🤖</div>
+        <div class="meta"><div class="mach">▸ <b>vikas-mac</b></div><div class="lvl">Lv.9 · Dashboard Mage</div></div>
+      </div>
+      <div class="title">pagr-agent-monitor</div>
+      <div class="flavor">wired the settings modal + machines registry; deploying now.</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:100%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:72%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-work">⚙ WORKING</span><span class="tag">main</span><span>12S AGO</span></div>
+    </div>
+
+    <!-- waiting -->
+    <div class="card wait">
+      <div class="ribbon">STUCK?</div>
+      <div class="top">
+        <div class="ava" style="background:var(--purple)">🕵️</div>
+        <div class="meta"><div class="mach">▸ <b>prod-api</b></div><div class="lvl">Lv.6 · Bug Hunter</div></div>
+      </div>
+      <div class="title">Investigate flaky checkout test</div>
+      <div class="flavor">reproduced intermittently; suspecting a race in the cart lock.</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:75%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:40%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-wait">⏳ WAITING</span><span class="tag">hotfix</span><span>4M AGO</span></div>
+    </div>
+
+    <!-- working -->
+    <div class="card work">
+      <div class="ribbon">ON QUEST</div>
+      <div class="top">
+        <div class="ava" style="background:var(--mint)">🔐</div>
+        <div class="meta"><div class="mach">▸ <b>jump-server</b></div><div class="lvl">Lv.7 · Key Keeper</div></div>
+      </div>
+      <div class="title">Refactor auth module</div>
+      <div class="flavor">extracted TokenService, added 14 tests — all green! +140 XP</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:90%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:55%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-work">⚙ WORKING</span><span class="tag">feat/auth</span><span>1M AGO</span></div>
+    </div>
+
+    <!-- working -->
+    <div class="card work">
+      <div class="ribbon">ON QUEST</div>
+      <div class="top">
+        <div class="ava" style="background:var(--yellow)">📦</div>
+        <div class="meta"><div class="mach">▸ <b>jump-server</b></div><div class="lvl">Lv.3 · Pack Mule</div></div>
+      </div>
+      <div class="title">Nightly dependency upgrade</div>
+      <div class="flavor">bumping 14 packages, then running the full test suite.</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:85%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:30%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-work">⚙ WORKING</span><span class="tag">chore/deps</span><span>4M AGO</span></div>
+    </div>
+
+    <!-- done -->
+    <div class="card idle">
+      <div class="ribbon">CLEARED!</div>
+      <div class="top">
+        <div class="ava" style="background:#e7e2d2">✨</div>
+        <div class="meta"><div class="mach">▸ <b>vikas-mac</b></div><div class="lvl">Lv.9 · Dashboard Mage</div></div>
+      </div>
+      <div class="title">Polish dashboard styling</div>
+      <div class="flavor">tightened spacing on the light theme. quest complete ✓</div>
+      <div class="bars">
+        <div class="barrow"><span class="px">HP</span><div class="track hp"><i style="width:100%"></i></div></div>
+        <div class="barrow"><span class="px">XP</span><div class="track xp"><i style="width:100%"></i></div></div>
+      </div>
+      <div class="foot"><span class="status s-idle">✓ DONE</span><span class="tag">main</span><span>9M AGO</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

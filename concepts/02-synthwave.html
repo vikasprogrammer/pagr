@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pagr // grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Monoton&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#06010f; --sky1:#1a0938; --sky2:#3b0d63;
+    --pink:#ff2e97; --cyan:#16e0ff; --purple:#b06bff; --amber:#ffb648; --lime:#aaff66;
+    --text:#e9d9ff; --dim:#9b86c9;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:"Rajdhani",system-ui,sans-serif; color:var(--text);
+    background:linear-gradient(180deg,#06010f 0%, #160734 40%, #2a0a4f 100%);
+    overflow-x:hidden; position:relative; min-height:100%;
+  }
+  /* stars */
+  body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),
+      radial-gradient(1px 1px at 70% 18%,#fff,transparent),
+      radial-gradient(1px 1px at 45% 12%,#cbb6ff,transparent),
+      radial-gradient(1px 1px at 88% 40%,#fff,transparent),
+      radial-gradient(1px 1px at 12% 55%,#9be9ff,transparent);
+    opacity:.7}
+  /* perspective grid floor */
+  .floor{position:fixed; left:-20%; right:-20%; bottom:0; height:55vh; z-index:0; pointer-events:none;
+    background-image:linear-gradient(rgba(255,46,151,.0) 0,rgba(255,46,151,.0)),
+      repeating-linear-gradient(90deg, rgba(22,224,255,.5) 0 2px, transparent 2px 64px),
+      repeating-linear-gradient(0deg, rgba(255,46,151,.55) 0 2px, transparent 2px 64px);
+    transform:perspective(40vh) rotateX(70deg); transform-origin:bottom;
+    mask-image:linear-gradient(transparent, #000 60%);
+    animation:scroll 2.4s linear infinite;}
+  @keyframes scroll{from{background-position:0 0,0 0,0 0}to{background-position:0 0,0 0,0 64px}}
+  /* retro sun */
+  .sun{position:fixed; top:8vh; left:50%; transform:translateX(-50%); width:320px; height:320px; z-index:0;
+    border-radius:50%; pointer-events:none; filter:saturate(1.2);
+    background:linear-gradient(180deg,#ffd36b 0%, #ff7b54 38%, #ff2e97 70%, #b06bff 100%);
+    -webkit-mask:repeating-linear-gradient(#000 0 14px, transparent 14px 18px), radial-gradient(#000 60%, transparent 71%);
+    -webkit-mask-composite:source-in; mask-composite:intersect;
+    opacity:.5; box-shadow:0 0 120px 30px rgba(255,46,151,.25)}
+
+  .wrap{position:relative; z-index:2; max-width:1120px; margin:0 auto; padding:30px 20px 70px}
+  header{display:flex; align-items:flex-end; gap:18px; flex-wrap:wrap; margin-bottom:8px}
+  .logo{font-family:"Monoton",cursive; font-size:46px; line-height:.9; letter-spacing:1px;
+    background:linear-gradient(180deg,#fff, #ffd6f1 35%, var(--pink)); -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 18px rgba(255,46,151,.55), 0 0 40px rgba(255,46,151,.3)}
+  .tag{font-family:"Orbitron"; letter-spacing:5px; color:var(--cyan); font-size:12px; text-transform:uppercase;
+    text-shadow:0 0 10px rgba(22,224,255,.7); padding-bottom:8px}
+  .stats{margin-left:auto; display:flex; gap:10px; padding-bottom:6px}
+  .stat{border:1px solid rgba(176,107,255,.5); border-radius:10px; padding:6px 14px; text-align:center;
+    background:rgba(20,7,52,.5); box-shadow:0 0 18px rgba(176,107,255,.18) inset}
+  .stat .n{font-family:"Orbitron"; font-weight:900; font-size:20px; display:block; line-height:1}
+  .stat .l{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--dim)}
+  .stat.alert .n{color:var(--pink); text-shadow:0 0 12px var(--pink)}
+  .nav{display:flex; gap:8px; margin:16px 0 26px; flex-wrap:wrap}
+  .nav button{font-family:"Orbitron"; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--cyan); background:rgba(22,224,255,.06); border:1px solid rgba(22,224,255,.4);
+    border-radius:8px; padding:8px 14px; cursor:pointer; box-shadow:0 0 14px rgba(22,224,255,.12) inset}
+  .nav button:hover{background:rgba(22,224,255,.16)}
+  .nav .pink{color:var(--pink); border-color:rgba(255,46,151,.5); background:rgba(255,46,151,.07); box-shadow:0 0 14px rgba(255,46,151,.14) inset}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px}
+  .card{position:relative; border-radius:14px; padding:16px 16px 14px;
+    background:linear-gradient(160deg, rgba(40,12,80,.72), rgba(14,4,32,.72));
+    border:1px solid rgba(176,107,255,.35); backdrop-filter:blur(3px);
+    box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 14px 40px rgba(0,0,0,.5)}
+  .card::before{content:""; position:absolute; inset:0; border-radius:14px; padding:1px; pointer-events:none;
+    background:linear-gradient(160deg,var(--accent,var(--purple)), transparent 60%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:.8}
+  .card.working{--accent:var(--cyan)} .card.need{--accent:var(--pink)}
+  .card.wait{--accent:var(--purple)} .card.idle{--accent:#4a3d75}
+  .card.need{box-shadow:0 0 26px rgba(255,46,151,.35); animation:alarm 1.6s ease-in-out infinite}
+  @keyframes alarm{50%{box-shadow:0 0 40px rgba(255,46,151,.6)}}
+  .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+  .mach{font-family:"Orbitron"; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--dim)}
+  .mach b{color:#fff}
+  .chip{font-family:"Orbitron"; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+    padding:4px 9px; border-radius:999px; border:1px solid currentColor}
+  .c-working{color:var(--cyan); text-shadow:0 0 10px rgba(22,224,255,.7)}
+  .c-need{color:var(--pink); text-shadow:0 0 10px rgba(255,46,151,.8)}
+  .c-wait{color:var(--purple)} .c-idle{color:#7d6fb0}
+  .ttl{font-size:21px; font-weight:700; color:#fff; line-height:1.15; margin:2px 0 6px;
+    text-shadow:0 0 18px rgba(176,107,255,.3)}
+  .meta{font-size:13px; color:var(--cyan); letter-spacing:.5px; margin-bottom:8px}
+  .meta .path{color:var(--dim)}
+  .sum{font-size:14px; color:#d7c7ff; opacity:.9; min-height:2.6em}
+  .foot{display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--dim);
+    border-top:1px dashed rgba(176,107,255,.3); padding-top:8px; letter-spacing:1px}
+  .bar{height:5px; border-radius:3px; background:rgba(255,255,255,.07); overflow:hidden; margin-top:8px}
+  .bar i{display:block; height:100%; background:linear-gradient(90deg,var(--cyan),var(--pink));
+    box-shadow:0 0 10px var(--cyan); animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.55}}
+</style>
+</head>
+<body>
+<div class="sun"></div>
+<div class="floor"></div>
+<div class="wrap">
+  <header>
+    <div class="logo">pagr</div>
+    <div class="tag">// agent&nbsp;grid</div>
+    <div class="stats">
+      <div class="stat alert"><span class="n">2</span><span class="l">need you</span></div>
+      <div class="stat"><span class="n">6</span><span class="l">agents</span></div>
+      <div class="stat"><span class="n">2</span><span class="l">machines</span></div>
+    </div>
+  </header>
+  <div class="nav">
+    <button class="pink">▲ Needs you</button>
+    <button>▣ Machines</button>
+    <button>⤢ Group: status</button>
+    <button>✦ Clear done</button>
+    <button>⚙ Settings</button>
+  </div>
+
+  <div class="grid">
+    <div class="card need">
+      <div class="top"><div class="mach">▸ <b>jump-server</b></div><div class="chip c-need">needs input</div></div>
+      <div class="ttl">Fix failing DB migration</div>
+      <div class="meta">deploy <span class="path">· ~/api</span></div>
+      <div class="sum">permission: run <code>alembic upgrade head</code>?</div>
+      <div class="foot"><span>SESSION #4f3a</span><span>2m ago</span></div>
+    </div>
+
+    <div class="card working">
+      <div class="top"><div class="mach">▸ <b>vikas-mac</b></div><div class="chip c-working">working</div></div>
+      <div class="ttl">pagr-agent-monitor</div>
+      <div class="meta">main <span class="path">· ~/vapps/pagr</span></div>
+      <div class="sum">wired the settings modal + machines registry; deploying now.</div>
+      <div class="bar"><i style="width:72%"></i></div>
+      <div class="foot"><span>SESSION #6453</span><span>12s ago</span></div>
+    </div>
+
+    <div class="card wait">
+      <div class="top"><div class="mach">▸ <b>prod-api</b></div><div class="chip c-wait">waiting</div></div>
+      <div class="ttl">Investigate flaky checkout test</div>
+      <div class="meta">hotfix <span class="path">· ~/shop/api</span></div>
+      <div class="sum">reproduced intermittently; suspecting a race in the cart lock.</div>
+      <div class="foot"><span>SESSION #91bd</span><span>4m ago</span></div>
+    </div>
+
+    <div class="card working">
+      <div class="top"><div class="mach">▸ <b>jump-server</b></div><div class="chip c-working">working</div></div>
+      <div class="ttl">Refactor auth module</div>
+      <div class="meta">feat/auth <span class="path">· ~/agents/ceo</span></div>
+      <div class="sum">extracted TokenService, added 14 tests — all green.</div>
+      <div class="bar"><i style="width:45%"></i></div>
+      <div class="foot"><span>SESSION #2c70</span><span>1m ago</span></div>
+    </div>
+
+    <div class="card working">
+      <div class="top"><div class="mach">▸ <b>jump-server</b></div><div class="chip c-working">working</div></div>
+      <div class="ttl">Nightly dependency upgrade</div>
+      <div class="meta">chore/deps <span class="path">· ~/monorepo</span></div>
+      <div class="sum">bumping 14 packages, then running the full suite.</div>
+      <div class="bar"><i style="width:30%"></i></div>
+      <div class="foot"><span>SESSION #45e9</span><span>4m ago</span></div>
+    </div>
+
+    <div class="card idle">
+      <div class="top"><div class="mach">▸ <b>vikas-mac</b></div><div class="chip c-idle">idle</div></div>
+      <div class="ttl">Polish dashboard styling</div>
+      <div class="meta">main <span class="path">· ~/vapps/pagr</span></div>
+      <div class="sum">tightened spacing on the light theme.</div>
+      <div class="foot"><span>SESSION #a1f8</span><span>9m ago</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

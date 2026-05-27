@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pagr — concept gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0c0d12;color:#e8eaf0;font-family:"JetBrains Mono",monospace;padding:48px 20px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-family:"Space Grotesk",sans-serif;font-size:30px;margin:0 0 4px;letter-spacing:-.5px}
+  p.sub{color:#7c8398;margin:0 0 36px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  a.card{display:block;text-decoration:none;color:inherit;border:1px solid #20232e;border-radius:14px;
+    overflow:hidden;background:#13151c;transition:transform .12s,border-color .12s}
+  a.card:hover{transform:translateY(-3px);border-color:#3a4154}
+  .swatch{height:120px;display:flex;align-items:center;justify-content:center;font-family:"Space Grotesk";font-weight:700;font-size:22px}
+  .s1{background:#06090a;color:#46f08a;font-family:"JetBrains Mono"}
+  .s2{background:linear-gradient(135deg,#1a0938,#3b0d63);color:#ff2e97;text-shadow:0 0 14px #ff2e97}
+  .s3{background:#0c131b;color:#ffb627;letter-spacing:3px;font-size:14px}
+  .s4{background:#ffd23f;color:#15152b}
+  .meta{padding:14px 16px}
+  .meta b{font-family:"Space Grotesk";font-size:16px}
+  .meta span{display:block;color:#7c8398;font-size:12.5px;margin-top:4px}
+  .tag{display:inline-block;margin-top:10px;font-size:11px;color:#9aa3bb;border:1px solid #2a2f3d;border-radius:6px;padding:2px 7px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>pagr · concept gallery</h1>
+  <p class="sub">Four static directions for the agent dashboard. Same data, four personalities. Pick one to build out.</p>
+  <div class="grid">
+    <a class="card" href="01-terminal.html"><div class="swatch s1">~/pagr █</div><div class="meta"><b>01 · Terminal</b><span>Phosphor CRT, monospace, box-drawing, tmux status bar.</span><span class="tag">dev · dark</span></div></a>
+    <a class="card" href="02-synthwave.html"><div class="swatch s2">PAGR</div><div class="meta"><b>02 · Synthwave</b><span>Neon glow, perspective grid, retro sun. Cards as panels.</span><span class="tag">fun · dark</span></div></a>
+    <a class="card" href="03-mission-control.html"><div class="swatch s3">MISSION CONTROL</div><div class="meta"><b>03 · Mission Control</b><span>Ops telemetry, status LEDs, radar sweep, station rail.</span><span class="tag">ops · dark</span></div></a>
+    <a class="card" href="04-arcade.html"><div class="swatch s4">AGENT ARCADE</div><div class="meta"><b>04 · Arcade</b><span>Gamified neubrutalism — agents as characters with XP bars.</span><span class="tag">fun · light</span></div></a>
+  </div>
+</div>
+</body>
+</html>
