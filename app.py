@@ -676,8 +676,6 @@ DASHBOARD_HTML = r"""<!doctype html>
   .station .name{font-family:var(--font-head);letter-spacing:1px;color:var(--text);font-size:13px;font-weight:600;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .station .sub{color:var(--muted);font-size:11px;margin-top:3px}
-  .gauge{height:4px;border-radius:2px;background:var(--line);margin-top:9px;overflow:hidden}
-  .gauge i{display:block;height:100%;background:linear-gradient(90deg,var(--c-working),var(--c-wait))}
   .led{width:9px;height:9px;border-radius:50%;flex:none}
   .led.lw{background:var(--c-working);box-shadow:0 0 8px var(--c-working);animation:throbb 1.4s ease-in-out infinite}
   .led.la{background:var(--c-need);box-shadow:0 0 8px var(--c-need);animation:blink 1.1s steps(1) infinite}
@@ -928,10 +926,8 @@ function renderStations(){
     const mine = sessions.filter(s => s.machine === mc.name);
     const act = mine.filter(active).length;
     const led = mine.some(needy) ? "la" : (act ? "lw" : "lg");
-    const load = mine.length ? Math.round(act / mine.length * 100) : 0;  // % of sessions active
     return '<div class="station"><div class="h"><span class="name">'+esc(mc.name)+'</span><span class="led '+led+'"></span></div>'
-      + '<div class="sub">'+mine.length+' sessions · '+act+' active · '+(mc.last_seen?ago(mc.last_seen,now)+' ago':'—')+'</div>'
-      + '<div class="gauge"><i style="width:'+load+'%"></i></div></div>';
+      + '<div class="sub">'+mine.length+' sessions · '+act+' active · '+(mc.last_seen?ago(mc.last_seen,now)+' ago':'—')+'</div></div>';
   }).join("");
 }
 
